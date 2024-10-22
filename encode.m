@@ -20,7 +20,7 @@ function encoding = encode(encodingText, imBuffer)
     blockW = ceil(w / blockSizeUnhinged);
 
     posBlocked = mapHorizontalVertical(h / w * 100000, [blockH blockW], ENCODING_CAP);
-    function embedded = embeddedAtLsb(pixel, bit)
+    function embedded = embeddedInLsb(pixel, bit)
         embedded = bitor(bitand(pixel, 0xFE), bit);
     end
 
@@ -35,13 +35,15 @@ function encoding = encode(encodingText, imBuffer)
 
     for y = 1:blockH
         for x = 1:blockW
-            py = posBlocked(y, x, 1);
-            px = posBlocked(y, x, 2);
+            py = posBlocked(y, x, 1) * blockSize;
+            px = posBlocked(y, x, 2) * blockSize;
             if py == 0 || px == 0
                 return;
             end
 
-            encoding(py, px) = embeddedAtLsb(imBuffer(py, px), encodingBit((y - 1) * blockH + blockW));
+            bit = encodingBit((y - 1) * blockH + blockW);
+            embedding = embeddedInLsb(imBuffer(py, px), bit);
+            encoding(py : py + blockSize, px : px + blockSize) = embedding;
         end
     end
 end
