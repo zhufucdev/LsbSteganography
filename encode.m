@@ -1,7 +1,7 @@
-function encoding = encode(encodingText, imBuffer)
+function encoded = encode(encodingText, imBuffer)
     ENCODING_CAP = 256; RESERVED_PARTITION_CAP = 1; MAX_BLOCKSIZE = 4;
     textCap = size(encodingText, 2);
-    encoding = imBuffer;
+    encoded = imBuffer;
     if textCap > (ENCODING_CAP - RESERVED_PARTITION_CAP) / 8
         fprintf('Too much information to encode. I will fail.');
         return;
@@ -21,7 +21,7 @@ function encoding = encode(encodingText, imBuffer)
 
     posBlocked = mapHorizontalVertical(h / w * 100000, [blockH blockW], ENCODING_CAP);
     function embedded = embeddedInLsb(pixel, bit)
-        embedded = bitor(bitand(pixel, 0xFE), bit);
+        embedded = bitset(pixel, 1, bit);
     end
 
     function bit = encodingBit(pos)
@@ -42,8 +42,8 @@ function encoding = encode(encodingText, imBuffer)
             end
 
             bit = encodingBit((y - 1) * blockH + blockW);
-            embedding = embeddedInLsb(imBuffer(py, px), bit);
-            encoding(py : py + blockSize, px : px + blockSize) = embedding;
+            embedding = embeddedInLsb(imBuffer(py:py + blockSize - 1, px:px + blockSize - 1), bit);
+            encoded(py:py + blockSize - 1, px:px + blockSize - 1) = embedding;
         end
     end
 end
