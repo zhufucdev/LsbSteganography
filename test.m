@@ -1,5 +1,5 @@
 im = imread('test.jpeg');
-e = encode('Hola', im);
-% imshow(e);
+e = encode('IAmABear', im);
+er = imresize(e, 0.8);
 
-decode(e)
+decode(er)

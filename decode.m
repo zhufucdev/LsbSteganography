@@ -1,27 +1,28 @@
 function decoded = decode(imBuffer)
-    ENCODING_CAP = 256; MAX_BLOCKSIZE = 4;
+    ENCODING_CAP = 256;
 
     h = size(imBuffer, 1);
     w = size(imBuffer, 2);
 
     bufferCap = h * w;
-    blockSizeUnhinged = sqrt(bufferCap / ENCODING_CAP);
-    blockSize = min([int32(blockSizeUnhinged) MAX_BLOCKSIZE]);
-    blockH = ceil(h / blockSizeUnhinged);
-    blockW = ceil(w / blockSizeUnhinged);
+    gridSizeUnhinged = sqrt(bufferCap / ENCODING_CAP);
+    gridH = ceil(h / gridSizeUnhinged);
+    gridW = ceil(w / gridSizeUnhinged);
+    blockH = floor(h / gridH);
+    blockW = floor(w / gridW);
 
-    posBlocked = mapHorizontalVertical(h / w * 100000, [blockH blockW], ENCODING_CAP);
+    posBlocked = mapHorizontalVertical(h / w * 10, [gridH gridW], ENCODING_CAP);
     function embedding = embeddingInLsp(pixel)
         embedding = bitget(pixel, 1);
     end
 
     function block = readBlock(y, x)
-        py = posBlocked(y, x, 1) * blockSize;
-        px = posBlocked(y, x, 2) * blockSize;
-        if py == 0 || px == 0
+        py = (posBlocked(y, x, 1) - 1) * blockH + 1;
+        px = (posBlocked(y, x, 2) - 1) * blockW + 1;
+        if py <= 0 || px <= 0
             block = -1;
         else
-            b = embeddingInLsp(imBuffer(py:py + blockSize - 1, px:px + blockSize - 1));
+            b = embeddingInLsp(imBuffer(py:py + blockH - 1, px:px + blockW - 1));
             block = mode(b, 'all');
         end
     end
@@ -31,12 +32,12 @@ function decoded = decode(imBuffer)
     decoded = '';
     inverted = false;
 
-    if readBlock(ceil(ENCODING_CAP / blockW), rem(ENCODING_CAP, blockW)) == 1
+    if readBlock(ceil(ENCODING_CAP / gridW), rem(ENCODING_CAP, gridW)) == 1
         inverted = true;
     end
 
-    for y = 1:blockH
-        for x = 1:blockW
+    for y = 1:gridH
+        for x = 1:gridW
             block = readBlock(y, x);
             if block == -1
                 return;
