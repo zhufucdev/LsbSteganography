@@ -1,3 +1,5 @@
 im = imread('test.jpeg');
 e = encode('Hola', im);
-imshow(e);
+% imshow(e);
+
+decode(e)
