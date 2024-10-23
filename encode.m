@@ -25,11 +25,11 @@ function encoded = encode(encodingText, imBuffer)
     end
 
     function bit = encodingBit(pos)
-        y_ = floor(pos / 8);
+        y_ = ceil(pos / 8);
         if y_ > textCap
             bit = 0;
         else
-            bit = bitget(uint8(encodingText(y_)), rem(pos, 8));
+            bit = bitget(uint8(encodingText(y_)), rem(pos - 1, 8) + 1);
         end
     end
 
@@ -41,7 +41,7 @@ function encoded = encode(encodingText, imBuffer)
                 return;
             end
 
-            bit = encodingBit((y - 1) * blockH + blockW);
+            bit = encodingBit((y - 1) * blockH + x);
             embedding = embeddedInLsb(imBuffer(py:py + blockSize - 1, px:px + blockSize - 1), bit);
             encoded(py:py + blockSize - 1, px:px + blockSize - 1) = embedding;
         end
