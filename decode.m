@@ -15,21 +15,38 @@ function decoded = decode(imBuffer)
         embedding = bitget(pixel, 1);
     end
 
+    function block = readBlock(y, x)
+        py = posBlocked(y, x, 1) * blockSize;
+        px = posBlocked(y, x, 2) * blockSize;
+        if py == 0 || px == 0
+            block = -1;
+        else
+            b = embeddingInLsp(imBuffer(py:py + blockSize - 1, px:px + blockSize - 1));
+            block = mode(b, 'all');
+        end
+    end
+
     decodingBuff = 0;
     decodingPos = 1;
     decoded = '';
+    inverted = false;
+
+    if readBlock(ceil(ENCODING_CAP / blockW), rem(ENCODING_CAP, blockW)) == 1
+        inverted = true;
+    end
 
     for y = 1:blockH
         for x = 1:blockW
-            py = posBlocked(y, x, 1) * blockSize;
-            px = posBlocked(y, x, 2) * blockSize;
-            if py == 0 || px == 0
+            block = readBlock(y, x);
+            if block == -1
                 return;
             end
 
-            block = embeddingInLsp(imBuffer(py:py + blockSize - 1, px:px + blockSize - 1));
-            bit = mode(block, 'all');
-            decodingBuff = bitset(decodingBuff, decodingPos, bit);
+            if inverted
+                block = not(block);
+            end
+
+            decodingBuff = bitset(decodingBuff, decodingPos, block);
             decodingPos = decodingPos + 1;
             if decodingPos > 8
                 decoded = strcat(decoded, char(decodingBuff));
