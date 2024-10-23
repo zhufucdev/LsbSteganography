@@ -29,7 +29,7 @@ function decoded = decode(imBuffer)
 
             block = embeddingInLsp(imBuffer(py:py + blockSize - 1, px:px + blockSize - 1));
             bit = mode(block, 'all');
-            decodingBuff = bitor(decodingBuff, bitset(0, decodingPos, bit));
+            decodingBuff = bitset(decodingBuff, decodingPos, bit);
             decodingPos = decodingPos + 1;
             if decodingPos > 8
                 decoded = strcat(decoded, char(decodingBuff));
