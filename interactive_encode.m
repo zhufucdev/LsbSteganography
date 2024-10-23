@@ -4,8 +4,9 @@ file = input('Path to encoding image:', 's');
 im = imread(file);
 encodeBuffer = encode(text, im);
 
-subplot(1, 2, 1);
-imshow(im);
+dest = input('Path to output file (encoded.png):', 's');
+if size(dest, 2) <= 0
+    dest = 'encoded.png';
+end
 
-subplot(1, 2, 2);
-imshow(encodeBuffer);
+imwrite(encodeBuffer, dest);
