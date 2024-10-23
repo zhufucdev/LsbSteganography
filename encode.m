@@ -41,7 +41,7 @@ function encoded = encode(encodingText, imBuffer)
                 return;
             end
 
-            bit = encodingBit((y - 1) * blockH + x);
+            bit = encodingBit((y - 1) * blockW + x);
             embedding = embeddedInLsb(imBuffer(py:py + blockSize - 1, px:px + blockSize - 1), bit);
             encoded(py:py + blockSize - 1, px:px + blockSize - 1) = embedding;
         end
