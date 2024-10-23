@@ -20,8 +20,11 @@ function map = mapHorizontalVertical(seed, size_, count_limit)
             while duplicated
                 map(y, x, :) = gen_();
                 duplicated = false;
-                for y_ = 1:y-1
-                    for x_ = 1:x-1
+                for y_ = 1:y
+                    for x_ = 1:size_(2)
+                        if x == x_ && y == y_
+                            continue
+                        end
                         if map(y, x, :) == map(y_, x_, :)
                             duplicated = true;
                             break;
